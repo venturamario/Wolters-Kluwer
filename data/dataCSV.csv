@@ -1,0 +1,11 @@
+DNI,nombre,apellidos,fechaNacimiento,telefono,email
+12345678A,Juan,Perez,1990-01-01,600123123,juan@example.com
+87654321B,Maria,Garcia,1992-05-15,611987654,maria@example.com
+11223344C,Carlos,Rodriguez,1985-11-23,622334455,carlos@example.com
+44556677D,Ana,Martinez,1995-03-10,633445566,ana@example.com
+99887766E,Luis,Fernandez,1988-07-30,644556677,luis@example.com
+55443322F,Laura,Sanchez,1993-09-05,655667788,laura@example.com
+77889900G,David,Gomez,1991-12-12,666778899,david@example.com
+22334455H,Sofia,Lopez,1994-04-18,677889900,sofia@example.com
+66778899I,Manuel,Diaz,1987-06-25,688990011,manuel@example.com
+33445566J,Elena,Moreno,1996-08-08,699001122,elena@example.com

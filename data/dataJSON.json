@@ -1,0 +1,12 @@
+[
+  {"DNI": "12345678A", "nombre": "Juan", "apellidos": "Perez", "fechaNacimiento": "1990-01-01", "telefono": "600123123", "email": "juan@example.com"},
+  {"DNI": "87654321B", "nombre": "Maria", "apellidos": "Garcia", "fechaNacimiento": "1992-05-15", "telefono": "611987654", "email": "maria@example.com"},
+  {"DNI": "11223344C", "nombre": "Carlos", "apellidos": "Rodriguez", "fechaNacimiento": "1985-11-23", "telefono": "622334455", "email": "carlos@example.com"},
+  {"DNI": "44556677D", "nombre": "Ana", "apellidos": "Martinez", "fechaNacimiento": "1995-03-10", "telefono": "633445566", "email": "ana@example.com"},
+  {"DNI": "99887766E", "nombre": "Luis", "apellidos": "Fernandez", "fechaNacimiento": "1988-07-30", "telefono": "644556677", "email": "luis@example.com"},
+  {"DNI": "55443322F", "nombre": "Laura", "apellidos": "Sanchez", "fechaNacimiento": "1993-09-05", "telefono": "655667788", "email": "laura@example.com"},
+  {"DNI": "77889900G", "nombre": "David", "apellidos": "Gomez", "fechaNacimiento": "1991-12-12", "telefono": "666778899", "email": "david@example.com"},
+  {"DNI": "22334455H", "nombre": "Sofia", "apellidos": "Lopez", "fechaNacimiento": "1994-04-18", "telefono": "677889900", "email": "sofia@example.com"},
+  {"DNI": "66778899I", "nombre": "Manuel", "apellidos": "Diaz", "fechaNacimiento": "1987-06-25", "telefono": "688990011", "email": "manuel@example.com"},
+  {"DNI": "33445566J", "nombre": "Elena", "apellidos": "Moreno", "fechaNacimiento": "1996-08-08", "telefono": "699001122", "email": "elena@example.com"}
+]
