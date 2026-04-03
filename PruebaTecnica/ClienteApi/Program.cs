@@ -21,7 +21,7 @@ void SaveClients(List<Client> clients) =>
 app.MapGet("/clientes", () => GetClients()); // [cite: 20]
 
 app.MapGet("/clientes/{dni}", (string dni) => {
-    var client = GetClients().FirstOrDefault(c => c.Dni == dni);
+    var client = GetClients().FirstOrDefault(c => c.DNI == dni);
     return client is not null
         ? Results.Ok(client)
         : Results.NotFound();
@@ -29,18 +29,18 @@ app.MapGet("/clientes/{dni}", (string dni) => {
 
 app.MapPost("/clientes", (Client newClient) => {
     var clients = GetClients();
-    if (clients.Any(c => c.Dni == newClient.Dni))
+    if (clients.Any(c => c.DNI == newClient.DNI))
     {
         return Results.BadRequest("DNI already exists");
     }
     clients.Add(newClient);
     SaveClients(clients);
-    return Results.Created($"/clientes/{newClient.Dni}", newClient);
+    return Results.Created($"/clientes/{newClient.DNI}", newClient);
 });
 
 app.MapDelete("/clientes/{dni}", (string dni) => {
     var clients = GetClients();
-    var client = clients.FirstOrDefault(c => c.Dni == dni);
+    var client = clients.FirstOrDefault(c => c.DNI == dni);
     if (client is null)
     {
         return Results.NotFound();
