@@ -61,11 +61,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Desktop\\PruebaTecnica\\ClienteDesktop\\ClienteDesktop.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\ClienteDesktop\\ClienteDesktop.csproj",
       "projectName": "ClienteDesktop",
-      "projectPath": "C:\\Users\\User\\Desktop\\PruebaTecnica\\ClienteDesktop\\ClienteDesktop.csproj",
+      "projectPath": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\ClienteDesktop\\ClienteDesktop.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Desktop\\PruebaTecnica\\ClienteDesktop\\obj\\",
+      "outputPath": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\ClienteDesktop\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
