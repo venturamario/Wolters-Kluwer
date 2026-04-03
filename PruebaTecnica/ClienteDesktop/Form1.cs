@@ -1,42 +1,92 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 using ClienteDesktop.Models;
+using ClienteDesktop.Services;
 using Newtonsoft.Json;
 
-public partial class Form1 : Form
+namespace ClienteDesktop
 {
-    private DataGridView dataGridView1 = new DataGridView();
-    private BindingList<Client> clientList = new BindingList<Client>();
-    private ProgressBar progressBar1 = new ProgressBar();
-    private Button btnImport = new Button();
-
-    public Form1()
+    public partial class Form1 : Form
     {
-        // Configuración básica de la ventana
-        this.Text = "Importación de Clientes";
-        this.Size = new Size(800, 500);
+        private DataGridView dataGridView1 = new DataGridView();
+        private BindingList<Client> clientList = new BindingList<Client>();
+        private ProgressBar progressBar1 = new ProgressBar();
+        private Button btnImport = new Button();
 
-        // 1. DataGridView (La rejilla)
-        dataGridView1.Dock = DockStyle.Top;
-        dataGridView1.Height = 300;
-        dataGridView1.DataSource = clientList; // Vinculación en memoria [cite: 14]
-        this.Controls.Add(dataGridView1);
+        public Form1()
+        {
+            InitializeComponent();
 
-        progressBar1.Dock = DockStyle.Bottom;
-        this.Controls.Add(progressBar1);
+            // Configuración de la Rejilla
+            dataGridView1.Dock = DockStyle.Top;
+            dataGridView1.Height = 400;
+            dataGridView1.DataSource = clientList;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.Controls.Add(dataGridView1);
 
-        // 3. Botón Importar
-        btnImport.Text = "Importar CSV/JSON";
-        btnImport.Location = new Point(10, 320);
-        btnImport.Click += BtnImport_Click;
-        this.Controls.Add(btnImport);
-        LoadDataOnStartup();
-    }
+            // Configuración de la Barra de Progreso
+            progressBar1.Location = new Point(10, 420);
+            progressBar1.Size = new Size(760, 23);
+            this.Controls.Add(progressBar1);
 
-    private void LoadDataOnStartup() {
-        string path = "clients_store.json";
-        if (File.Exists(path)) {
-            var data = JsonConvert.DeserializeObject<List<Client>>(File.ReadAllText(path));
-            foreach (var c in data) clientList.Add(c);
+            // Configuración del Botón
+            btnImport.Text = "Importar Datos";
+            btnImport.Location = new Point(10, 460);
+            btnImport.Size = new Size(200, 40);
+            btnImport.Click += BtnImport_Click;
+            this.Controls.Add(btnImport);
+
+            LoadDataOnStartup();
+        }
+
+        private void LoadDataOnStartup()
+        {
+            string path = "clients_store.json";
+            if (File.Exists(path))
+            {
+                var json = File.ReadAllText(path);
+                var data = JsonConvert.DeserializeObject<List<Client>>(json);
+                if (data != null)
+                {
+                    foreach (var c in data) clientList.Add(c);
+                }
+            }
+        }
+
+        private void BtnImport_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Archivos de datos (*.csv;*.json)|*.csv;*.json";
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var service = new ImportService();
+                    List<Client> imported = null;
+                    string ext = Path.GetExtension(openFileDialog.FileName).ToLower();
+
+                    if (ext == ".csv")
+                        imported = service.ImportFromCsv(openFileDialog.FileName, p => progressBar1.Value = p);
+                    else
+                        imported = service.ImportFromJson(openFileDialog.FileName);
+
+                    if (imported != null)
+                    {
+                        foreach (var c in imported) clientList.Add(c);
+                        MessageBox.Show("Importación completada");
+                    }
+                    progressBar1.Value = 0;
+                }
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            File.WriteAllText("clients_store.json", JsonConvert.SerializeObject(clientList, Formatting.Indented));
         }
     }
 }

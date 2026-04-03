@@ -4,7 +4,7 @@ namespace ClienteDesktop.Models
 {
     public class Client
     {
-        public string Dni { get; set; }
+        public string DNI { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime BirthDate { get; set; }
