@@ -70,7 +70,6 @@ namespace ClienteDesktop
 
                     try 
                     {
-                        // Importación según formato [cite: 10]
                         if (ext == ".csv")
                             imported = service.ImportFromCsv(openFileDialog.FileName, p => progressBar1.Value = p);
                         else
@@ -78,43 +77,44 @@ namespace ClienteDesktop
 
                         if (imported != null && imported.Count > 0)
                         {
-                            // Comprobar si hay duplicados por DNI 
-                            bool existsAny = imported.Any(newClient => clientList.Any(current => current.DNI == newClient.DNI));
+                            // Comprobar si algún DNI ya existe en la lista actual
+                            bool existsAny = imported.Any(newCl => clientList.Any(curr => curr.DNI == newCl.DNI));
 
                             if (existsAny)
                             {
                                 var result = MessageBox.Show(
-                                    "Parece que algunas de las filas que intentas importar ya existen. ¿Deseas sobreescribir los datos actuales? (Si eliges 'No', los datos se duplicarán/añadirán)",
-                                    "Datos Duplicados",
+                                    "Algunas filas ya existen. ¿Deseas sobreescribir los datos actuales? (Si eliges 'No', se añadirán duplicándolos)",
+                                    "Aviso de Duplicados",
                                     MessageBoxButtons.YesNoCancel,
-                                    MessageBoxIcon.Question);
+                                    MessageBoxIcon.Warning);
 
                                 if (result == DialogResult.Yes)
                                 {
-                                    // Sobreescribir: Borrar actuales y poner los nuevos 
-                                    clientList.Clear();
+                                    clientList.Clear(); // Sobreescribir: borra todo lo actual [cite: 14]
                                 }
                                 else if (result == DialogResult.Cancel)
                                 {
-                                    return; // Abortar operación
+                                    return; // No hace nada
                                 }
-                                }
+                                // Si es 'No', simplemente sigue y los añade al final
+                            }
 
-                            foreach (var c in imported) clientList.Add(c);
-                            MessageBox.Show($"Se han procesado {imported.Count} clientes correctamente.");
+                            foreach (var c in imported)
+                            {
+                                clientList.Add(c);
+                            }
+                            MessageBox.Show($"Procesados {imported.Count} registros.");
                         }
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error durante la importación: " + ex.Message);
+                        MessageBox.Show("Error: " + ex.Message);
                     }
-                    finally
-                    {
-                        progressBar1.Value = 0;
-                    }
+                    finally { progressBar1.Value = 0; }
                 }
             }
         }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
