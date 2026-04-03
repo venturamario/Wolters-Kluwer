@@ -68,17 +68,49 @@ namespace ClienteDesktop
                     List<Client> imported = null;
                     string ext = Path.GetExtension(openFileDialog.FileName).ToLower();
 
-                    if (ext == ".csv")
-                        imported = service.ImportFromCsv(openFileDialog.FileName, p => progressBar1.Value = p);
-                    else
-                        imported = service.ImportFromJson(openFileDialog.FileName);
-
-                    if (imported != null)
+                    try 
                     {
-                        foreach (var c in imported) clientList.Add(c);
-                        MessageBox.Show("Importación completada");
+                        if (ext == ".csv")
+                            imported = service.ImportFromCsv(openFileDialog.FileName, p => progressBar1.Value = p);
+                        else
+                            imported = service.ImportFromJson(openFileDialog.FileName);
+
+                        if (imported != null && imported.Count > 0)
+                        {
+                            // Comprobar si algún DNI ya existe en la lista actual
+                            bool existsAny = imported.Any(newCl => clientList.Any(curr => curr.DNI == newCl.DNI));
+
+                            if (existsAny)
+                            {
+                                var result = MessageBox.Show(
+                                    "Algunas filas ya existen. ¿Deseas sobreescribir los datos actuales? (Si eliges 'No', se añadirán duplicándolos)",
+                                    "Aviso de Duplicados",
+                                    MessageBoxButtons.YesNoCancel,
+                                    MessageBoxIcon.Warning);
+
+                                if (result == DialogResult.Yes)
+                                {
+                                    clientList.Clear(); // Sobreescribir: borra todo lo actual [cite: 14]
+                                }
+                                else if (result == DialogResult.Cancel)
+                                {
+                                    return; // No hace nada
+                                }
+                                // Si es 'No', simplemente sigue y los añade al final
+                            }
+
+                            foreach (var c in imported)
+                            {
+                                clientList.Add(c);
+                            }
+                            MessageBox.Show($"Procesados {imported.Count} registros.");
+                        }
                     }
-                    progressBar1.Value = 0;
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error: " + ex.Message);
+                    }
+                    finally { progressBar1.Value = 0; }
                 }
             }
         }
