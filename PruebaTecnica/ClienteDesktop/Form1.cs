@@ -68,21 +68,53 @@ namespace ClienteDesktop
                     List<Client> imported = null;
                     string ext = Path.GetExtension(openFileDialog.FileName).ToLower();
 
-                    if (ext == ".csv")
-                        imported = service.ImportFromCsv(openFileDialog.FileName, p => progressBar1.Value = p);
-                    else
-                        imported = service.ImportFromJson(openFileDialog.FileName);
-
-                    if (imported != null)
+                    try 
                     {
-                        foreach (var c in imported) clientList.Add(c);
-                        MessageBox.Show("Importación completada");
+                        // Importación según formato [cite: 10]
+                        if (ext == ".csv")
+                            imported = service.ImportFromCsv(openFileDialog.FileName, p => progressBar1.Value = p);
+                        else
+                            imported = service.ImportFromJson(openFileDialog.FileName);
+
+                        if (imported != null && imported.Count > 0)
+                        {
+                            // Comprobar si hay duplicados por DNI 
+                            bool existsAny = imported.Any(newClient => clientList.Any(current => current.DNI == newClient.DNI));
+
+                            if (existsAny)
+                            {
+                                var result = MessageBox.Show(
+                                    "Parece que algunas de las filas que intentas importar ya existen. ¿Deseas sobreescribir los datos actuales? (Si eliges 'No', los datos se duplicarán/añadirán)",
+                                    "Datos Duplicados",
+                                    MessageBoxButtons.YesNoCancel,
+                                    MessageBoxIcon.Question);
+
+                                if (result == DialogResult.Yes)
+                                {
+                                    // Sobreescribir: Borrar actuales y poner los nuevos 
+                                    clientList.Clear();
+                                }
+                                else if (result == DialogResult.Cancel)
+                                {
+                                    return; // Abortar operación
+                                }
+                                }
+
+                            foreach (var c in imported) clientList.Add(c);
+                            MessageBox.Show($"Se han procesado {imported.Count} clientes correctamente.");
+                        }
                     }
-                    progressBar1.Value = 0;
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error durante la importación: " + ex.Message);
+                    }
+                    finally
+                    {
+                        progressBar1.Value = 0;
+                    }
                 }
             }
         }
-
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
