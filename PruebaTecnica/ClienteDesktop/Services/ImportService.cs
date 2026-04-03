@@ -18,7 +18,7 @@ namespace ClienteDesktop.Services
                 if (cols.Length >= 6)
                 {
                     list.Add(new Client {
-                        Dni = cols[0], FirstName = cols[1], LastName = cols[2],
+                        DNI = cols[0], FirstName = cols[1], LastName = cols[2],
                         BirthDate = DateTime.Parse(cols[3]), Phone = cols[4], Email = cols[5]
                     });
                 }
