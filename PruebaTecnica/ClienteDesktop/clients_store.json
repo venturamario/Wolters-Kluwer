@@ -142,5 +142,13 @@
     "fechaNacimiento": "1987-06-25T00:00:00",
     "telefono": "688990011",
     "email": "manuel@example.com"
+  },
+  {
+    "dni": "11112222X",
+    "nombre": "Prueba",
+    "apellidos": "Postman",
+    "fechaNacimiento": "1995-10-10T00:00:00",
+    "telefono": "600000000",
+    "email": "postman@test.com"
   }
 ]
