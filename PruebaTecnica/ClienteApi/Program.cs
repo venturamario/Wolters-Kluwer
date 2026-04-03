@@ -1,41 +1,53 @@
+using ClienteApi.Models;
+using Newtonsoft.Json;
+
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
+string filePath = Path.Combine(AppContext.BaseDirectory, "data", "clients_store.json");
+
+if (!Directory.Exists("data")) Directory.CreateDirectory("data");
+
+// Helper para leer/escribir
+List<Client> GetClients() {
+    if (!File.Exists(filePath)) return new List<Client>();
+    var json = File.ReadAllText(filePath);
+    return JsonConvert.DeserializeObject<List<Client>>(json) ?? new List<Client>();
 }
 
-app.UseHttpsRedirection();
+void SaveClients(List<Client> clients) => 
+    File.WriteAllText(filePath, JsonConvert.SerializeObject(clients, Formatting.Indented));
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapGet("/clientes", () => GetClients()); // [cite: 20]
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapGet("/clientes/{dni}", (string dni) => {
+    var client = GetClients().FirstOrDefault(c => c.Dni == dni);
+    return client is not null
+        ? Results.Ok(client)
+        : Results.NotFound();
+});
+
+app.MapPost("/clientes", (Client newClient) => {
+    var clients = GetClients();
+    if (clients.Any(c => c.Dni == newClient.Dni))
+    {
+        return Results.BadRequest("DNI already exists");
+    }
+    clients.Add(newClient);
+    SaveClients(clients);
+    return Results.Created($"/clientes/{newClient.Dni}", newClient);
+});
+
+app.MapDelete("/clientes/{dni}", (string dni) => {
+    var clients = GetClients();
+    var client = clients.FirstOrDefault(c => c.Dni == dni);
+    if (client is null)
+    {
+        return Results.NotFound();
+    }
+    clients.Remove(client);
+    SaveClients(clients);
+    return Results.NoContent();
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
