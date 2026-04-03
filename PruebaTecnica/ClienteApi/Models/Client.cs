@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace ClienteDesktop.Models
+namespace ClienteApi.Models
 {
     public class Client
     {
