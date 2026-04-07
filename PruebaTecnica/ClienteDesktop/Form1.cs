@@ -48,7 +48,7 @@ namespace ClienteDesktop
 
             // Configuración delete button
             btnDelete.Text = "Eliminar Fila";
-            btnDelete.Location = new Point(220, 460); // Al lado del de importar
+            btnDelete.Location = new Point(220, 460);
             btnDelete.Size = new Size(150, 40);
             btnDelete.Click += (s, e) => {
                 if (dataGridView1.CurrentRow != null && !dataGridView1.CurrentRow.IsNewRow)
@@ -154,7 +154,6 @@ namespace ClienteDesktop
                 // Si borra el DNI y lo deja vacío, no lanzamos duplicados (podemos dejar que el modelo gestione el nulo)
                 if (string.IsNullOrWhiteSpace(value)) return;
                 
-                // Buscamos duplicados
                 bool existeDuplicado = clientList.Any(c => c.DNI == value && clientList.IndexOf(c) != e.RowIndex);
                 
                 if (existeDuplicado)
@@ -176,7 +175,6 @@ namespace ClienteDesktop
                     }
                 }
 
-                // Validación de formato/algoritmo
                 if (!DataValidator.IsValidDni(value))
                 {
                     MessageBox.Show("DNI inválido. Asegúrese de que la letra corresponde al número.", "Error de Formato", MessageBoxButtons.OK, MessageBoxIcon.Error);

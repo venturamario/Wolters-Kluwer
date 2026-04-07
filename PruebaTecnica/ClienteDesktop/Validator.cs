@@ -19,7 +19,7 @@ namespace ClienteDesktop
             return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         }
 
-        // Valida que el teléfono tenga al menos 9 dígitos numéricos
+        // Valida que el teléfono tenga 9 dígitos numéricos
         public static bool IsValidPhone(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone)) return false;
