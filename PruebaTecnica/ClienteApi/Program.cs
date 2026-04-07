@@ -3,52 +3,62 @@ using Newtonsoft.Json;
 using ClienteApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options => {
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+});
+
+builder.Services.AddControllers().AddNewtonsoftJson();
 var app = builder.Build();
 
-// Requisito: Ruta al fichero JSON
-string filePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "ClienteDesktop", "bin", "Debug", "net8.0-windows", "clients_store.json");
+string filePath = @"C:\Users\User\Desktop\Wolters-Kluwer\PruebaTecnica\ClienteDesktop\clients_store.json";
 
-// Helper para leer el archivo
 List<Client> GetClients()
 {
+    // Requisito: Asegurar existencia
     if (!File.Exists(filePath)) return new List<Client>();
     var json = File.ReadAllText(filePath);
     return JsonConvert.DeserializeObject<List<Client>>(json) ?? new List<Client>();
 }
 
-// Helper para guardar el archivo
 void SaveClients(List<Client> clients) 
 {
     var json = JsonConvert.SerializeObject(clients, Formatting.Indented);
     File.WriteAllText(filePath, json);
 }
 
-// --- ENDPOINTS REQUERIDOS ---
-
-// GET /clientes: Listado completo
 app.MapGet("/clientes", () => Results.Ok(GetClients()));
 
-// GET /clientes/{dni}: Buscar por DNI
 app.MapGet("/clientes/{dni}", (string dni) =>
 {
     var client = GetClients().FirstOrDefault(c => c.DNI.Equals(dni, StringComparison.OrdinalIgnoreCase));
     return client is not null ? Results.Ok(client) : Results.NotFound();
 });
 
-// POST /clientes: Alta de cliente
-app.MapPost("/clientes", ([FromBody] Client newClient) =>
+app.MapPost("/clientes", async (HttpRequest request) =>
 {
-    if (string.IsNullOrEmpty(newClient.DNI)) return Results.BadRequest("DNI no puede estar vacío");
+    using var reader = new StreamReader(request.Body);
+    string body = await reader.ReadToEndAsync();
+
+    var newClient = JsonConvert.DeserializeObject<Client>(body);
+
+    if (newClient == null || string.IsNullOrEmpty(newClient.DNI))
+    {
+        return Results.BadRequest("Datos inválidos o DNI vacío");
+    }
 
     var clients = GetClients();
-    if (clients.Any(c => c.DNI == newClient.DNI)) return Results.BadRequest("El DNI ya existe");
+    
+    // Comprobar si el DNI ya existe (ignora mayúsculas/minúsculas)
+    if (clients.Any(c => c.DNI.Equals(newClient.DNI, StringComparison.OrdinalIgnoreCase))) 
+        return Results.BadRequest("El DNI ya existe");
 
     clients.Add(newClient);
     SaveClients(clients);
+    
     return Results.Created($"/clientes/{newClient.DNI}", newClient);
 });
 
-// DELETE /clientes/{dni}: Borrar cliente
 app.MapDelete("/clientes/{dni}", (string dni) =>
 {
     var clients = GetClients();
@@ -58,7 +68,7 @@ app.MapDelete("/clientes/{dni}", (string dni) =>
 
     clients.Remove(client);
     SaveClients(clients);
-    return Results.NoContent(); // 204 No Content
+    return Results.NoContent();     // 204
 });
 
 app.Run();
