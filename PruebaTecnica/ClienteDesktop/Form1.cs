@@ -48,7 +48,7 @@ namespace ClienteDesktop
 
             // Configuración delete button
             btnDelete.Text = "Eliminar Fila";
-            btnDelete.Location = new Point(220, 460); // Al lado del de importar
+            btnDelete.Location = new Point(220, 460);
             btnDelete.Size = new Size(150, 40);
             btnDelete.Click += (s, e) => {
                 if (dataGridView1.CurrentRow != null && !dataGridView1.CurrentRow.IsNewRow)
@@ -79,6 +79,12 @@ namespace ClienteDesktop
             }
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            File.WriteAllText("clients_store.json", JsonConvert.SerializeObject(clientList, Formatting.Indented));
+        }
+
         private void BtnImport_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -87,94 +93,116 @@ namespace ClienteDesktop
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     var service = new ImportService();
-                    List<Client> imported = null;
+                    List<Client> rawData = null;
                     string ext = Path.GetExtension(openFileDialog.FileName).ToLower();
 
                     try 
                     {
                         if (ext == ".csv")
-                            imported = service.ImportFromCsv(openFileDialog.FileName, p => progressBar1.Value = p);
+                            rawData = service.ImportFromCsv(openFileDialog.FileName, p => progressBar1.Value = p);
                         else
-                            imported = service.ImportFromJson(openFileDialog.FileName);
+                            rawData = service.ImportFromJson(openFileDialog.FileName);
 
-                        if (imported != null && imported.Count > 0)
+                        if (rawData != null && rawData.Count > 0)
                         {
-                            // Comprobar si algún DNI ya existe en la lista actual
-                            bool existsAny = imported.Any(newCl => clientList.Any(curr => curr.DNI == newCl.DNI));
+                            // --- CORRECCIÓN 1: Filtrar solo datos válidos para evitar errores al importar ---
+                            var imported = rawData.Where(c => 
+                                DataValidator.IsValidDni(c.DNI) && 
+                                (string.IsNullOrEmpty(c.Email) || DataValidator.IsValidEmail(c.Email))
+                            ).ToList();
 
+                            if (imported.Count == 0)
+                            {
+                                MessageBox.Show("El archivo no contiene registros con formato de DNI válido.", "Importación cancelada");
+                                return;
+                            }
+
+                            // Lógica de duplicados (se mantiene igual)
+                            bool existsAny = imported.Any(newCl => clientList.Any(curr => curr.DNI == newCl.DNI));
                             if (existsAny)
                             {
                                 var result = MessageBox.Show(
-                                    "Algunas filas ya existen. ¿Deseas sobreescribir los datos actuales? (Si eliges 'No', se añadirán duplicándolos)",
+                                    "Algunas filas ya existen. ¿Deseas sobreescribir los datos actuales?",
                                     "Aviso de Duplicados",
                                     MessageBoxButtons.YesNoCancel,
                                     MessageBoxIcon.Warning);
 
-                                if (result == DialogResult.Yes)
-                                {
-                                    clientList.Clear(); // Sobreescribir: borra todo lo actual [cite: 14]
-                                }
-                                else if (result == DialogResult.Cancel)
-                                {
-                                    return; // No hace nada
-                                }
-                                // Si es 'No', simplemente sigue y los añade al final
+                                if (result == DialogResult.Yes) clientList.Clear();
+                                else if (result == DialogResult.Cancel) return;
                             }
 
-                            foreach (var c in imported)
-                            {
-                                clientList.Add(c);
-                            }
-                            MessageBox.Show($"Procesados {imported.Count} registros.");
+                            foreach (var c in imported) clientList.Add(c);
+                            MessageBox.Show($"Procesados {imported.Count} registros válidos (se omitieron {rawData.Count - imported.Count} inválidos).");
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error: " + ex.Message);
-                    }
+                    catch (Exception ex) { MessageBox.Show("Error: " + ex.Message); }
                     finally { progressBar1.Value = 0; }
                 }
             }
         }
 
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            base.OnFormClosing(e);
-            File.WriteAllText("clients_store.json", JsonConvert.SerializeObject(clientList, Formatting.Indented));
-        }
-    
         private void DataGridView1_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
-            // Solo validamos si la celda editada es la de "Dni"
-            if (dataGridView1.Columns[e.ColumnIndex].DataPropertyName == "Dni")
+            if (!dataGridView1.IsCurrentCellDirty) return;
+
+            string columnName = dataGridView1.Columns[e.ColumnIndex].DataPropertyName;
+            string value = e.FormattedValue?.ToString() ?? "";
+
+            // 1. VALIDACIÓN DE DNI
+            if (columnName == "DNI" || columnName == "Dni")
             {
-                string nuevoDni = e.FormattedValue.ToString();
+                // Si borra el DNI y lo deja vacío, no lanzamos duplicados (podemos dejar que el modelo gestione el nulo)
+                if (string.IsNullOrWhiteSpace(value)) return;
                 
-                // Evitar validación si el campo está vacío (ya que es requisito que no lo esté)
-                if (string.IsNullOrWhiteSpace(nuevoDni)) return;
-
-                // Buscamos si ese DNI ya existe en OTRO registro que no sea el que estamos editando
-                bool existe = clientList.Any(c => c.DNI == nuevoDni && clientList.IndexOf(c) != e.RowIndex);
-
-                if (existe)
+                bool existeDuplicado = clientList.Any(c => c.DNI == value && clientList.IndexOf(c) != e.RowIndex);
+                
+                if (existeDuplicado)
                 {
                     var result = MessageBox.Show(
-                        $"El DNI '{nuevoDni}' ya existe. ¿Deseas sobreescribir la lista completa con este nuevo registro? (Si eliges 'No', se permitirá el duplicado)",
+                        $"El DNI '{value}' ya existe. ¿Deseas sobreescribir la lista completa con este nuevo registro?",
                         "DNI Duplicado detectado",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning);
 
                     if (result == DialogResult.Yes)
                     {
-                        // Sobreescribir según tu requerimiento: borrar todo y empezar de nuevo
-                        // Usamos BeginInvoke para no interrumpir el ciclo de validación de la celda
                         this.BeginInvoke(new MethodInvoker(() => {
-                            var clienteUnico = new Client { DNI = nuevoDni };
+                            var clienteUnico = new Client { DNI = value };
                             clientList.Clear();
                             clientList.Add(clienteUnico);
                         }));
+                        return;
                     }
-                    // Si el usuario elige 'No', la validación pasa y se permite el duplicado.
+                }
+
+                if (!DataValidator.IsValidDni(value))
+                {
+                    MessageBox.Show("DNI inválido. Asegúrese de que la letra corresponde al número.", "Error de Formato", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Cancel = true;
+                }
+            }
+            
+            // 2. VALIDACIÓN DE EMAIL
+            else if (columnName == "Email")
+            {
+                if (string.IsNullOrWhiteSpace(value)) return;
+
+                if (!DataValidator.IsValidEmail(value))
+                {
+                    MessageBox.Show("El formato del email no es correcto.", "Error de Formato", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Cancel = true;
+                }
+            }
+
+            // 3. VALIDACIÓN DE TELÉFONO
+            else if (columnName == "Phone")
+            {
+                if (string.IsNullOrWhiteSpace(value)) return;
+
+                if (!DataValidator.IsValidPhone(value))
+                {
+                    MessageBox.Show("El teléfono debe ser numérico (9-15 dígitos).", "Error de Formato", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Cancel = true;
                 }
             }
         }
