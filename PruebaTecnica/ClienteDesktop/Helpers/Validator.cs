@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
 
-namespace ClienteDesktop
+namespace ClienteDesktop.Helpers
 {
-    public static class DataValidator
+    public static class Validator
     {
         #region User Data Validation
         // VALIDATE USER DATA BY USING REGULAR EXPRESSIONS (REGEX)

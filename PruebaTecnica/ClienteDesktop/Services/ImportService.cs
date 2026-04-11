@@ -3,11 +3,42 @@ using System.Collections.Generic;
 using System.IO;
 using ClienteDesktop.Models;
 using Newtonsoft.Json;
+using ClienteDesktop.Helpers;
 
 namespace ClienteDesktop.Services
 {
     public class ImportService
     {
+        public List<Client> Import(string filePath, Action<int> progressCallback)
+        {
+            string extension = Path.GetExtension(filePath).ToLower();
+            List<Client> rawData;
+            
+            if (extension == ".csv")
+            {
+                rawData = ImportFromCsv(filePath, progressCallback);
+            }
+            else if (extension == ".json")
+            {
+                rawData = ImportFromJson(filePath);
+            }                
+            else
+            {
+                throw new Exception("Formato de archivo no soportado.");                
+            }
+
+            if (rawData == null)
+            {
+                return new List<Client>();
+            }
+
+            // 2. SOLID: El servicio se encarga de entregar solo datos que CUMPLEN las reglas
+            return rawData.Where(c => 
+                Validator.IsValidDni(c.DNI) && 
+                (string.IsNullOrEmpty(c.Email) || Validator.IsValidEmail(c.Email))
+            ).ToList();
+        }
+
         public List<Client> ImportFromCsv(string path, Action<int> reportProgress)
         {
             var list = new List<Client>();
@@ -26,7 +57,6 @@ namespace ClienteDesktop.Services
             }
             return list;
         }
-
         public List<Client> ImportFromJson(string path)
         {
             return JsonConvert.DeserializeObject<List<Client>>(File.ReadAllText(path));

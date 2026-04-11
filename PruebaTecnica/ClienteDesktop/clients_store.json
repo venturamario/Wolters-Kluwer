@@ -1,5 +1,21 @@
 [
   {
+    "dni": "12345678A",
+    "nombre": "Juan",
+    "apellidos": "Perez",
+    "fechaNacimiento": "1990-01-01T00:00:00",
+    "telefono": "600123123",
+    "email": "juan@example.com"
+  },
+  {
+    "dni": "87654321B",
+    "nombre": "Maria",
+    "apellidos": "Garcia",
+    "fechaNacimiento": "1992-05-15T00:00:00",
+    "telefono": "611987654",
+    "email": "maria@example.com"
+  },
+  {
     "dni": "11223344C",
     "nombre": "Carlos",
     "apellidos": "Rodriguez",
@@ -10,13 +26,13 @@
   {
     "dni": "44556677D",
     "nombre": "Ana",
-    "apellidos": "pEREZ",
+    "apellidos": "Martinez",
     "fechaNacimiento": "1995-03-10T00:00:00",
     "telefono": "633445566",
     "email": "ana@example.com"
   },
   {
-    "dni": "99887741E",
+    "dni": "99887766E",
     "nombre": "Luis",
     "apellidos": "Fernandez",
     "fechaNacimiento": "1988-07-30T00:00:00",
@@ -46,14 +62,6 @@
     "fechaNacimiento": "1994-04-18T00:00:00",
     "telefono": "677889900",
     "email": "sofia@example.com"
-  },
-  {
-    "dni": "66778899I",
-    "nombre": "Manuel",
-    "apellidos": "Diaz",
-    "fechaNacimiento": "1987-06-25T00:00:00",
-    "telefono": "688990011",
-    "email": "manuel@example.com"
   },
   {
     "dni": "33445566J",
