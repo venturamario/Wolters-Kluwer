@@ -3,6 +3,9 @@
 [Bb]in/
 [Oo]bj/
 
+# Debug results
+[Dd]ebug/
+
 # Visual Studio cache/options directory
 .vs/
 
