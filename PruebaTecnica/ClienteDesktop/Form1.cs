@@ -12,12 +12,15 @@ namespace ClienteDesktop
 {
     public partial class Form1 : Form
     {
+        #region Vars
         private DataGridView dataGridView1 = new DataGridView();
         private BindingList<Client> clientList = new BindingList<Client>();
         private ProgressBar progressBar1 = new ProgressBar();
         private Button btnImport = new Button();
         private Button btnDelete = new Button();
+        #endregion
 
+        #region Constructors
         public Form1()
         {
             InitializeComponent();
@@ -64,7 +67,17 @@ namespace ClienteDesktop
 
             LoadDataOnStartup();
         }
+        #endregion
 
+        #region Protected Methods
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            File.WriteAllText("clients_store.json", JsonConvert.SerializeObject(clientList, Formatting.Indented));
+        }
+        #endregion
+
+        #region Private Methods
         private void LoadDataOnStartup()
         {
             string path = "clients_store.json";
@@ -78,13 +91,7 @@ namespace ClienteDesktop
                 }
             }
         }
-
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            base.OnFormClosing(e);
-            File.WriteAllText("clients_store.json", JsonConvert.SerializeObject(clientList, Formatting.Indented));
-        }
-
+        
         private void BtnImport_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -206,5 +213,6 @@ namespace ClienteDesktop
                 }
             }
         }
+        #endregion
     }
 }
