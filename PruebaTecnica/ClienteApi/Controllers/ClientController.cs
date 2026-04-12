@@ -10,7 +10,7 @@ public class ClientsController : ControllerBase {
     #endregion
 
     #region Constructors
-    public ClientsController(IClientManager manager) { // Inyección del manager
+    public ClientsController(IClientManager manager) {
         _manager = manager;
     }
     #endregion
@@ -23,11 +23,19 @@ public class ClientsController : ControllerBase {
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateClient(Client client) {
-        var success = await _manager.AddClient(client);
-        return success
-            ? Ok()
-            : BadRequest("El cliente ya existe o es inválido.");
+    public async Task<IActionResult> CreateClient(Client client) 
+    {
+        try
+        {
+            var success = await _manager.AddClient(client);
+            return success 
+                ? CreatedAtAction(nameof(GetAllClients), new { id = client.DNI }, client) 
+                : BadRequest("El cliente ya existe.");
+        } 
+        catch (Exception)
+        {
+            return StatusCode(500, "Ocurrió un error interno en el servidor.");
+        }
     }
     #endregion
 }
