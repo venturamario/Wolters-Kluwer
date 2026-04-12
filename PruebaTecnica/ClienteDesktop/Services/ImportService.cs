@@ -59,7 +59,8 @@ namespace ClienteDesktop.Services
         }
         public List<Client> ImportFromJson(string path)
         {
-            return JsonConvert.DeserializeObject<List<Client>>(File.ReadAllText(path));
+            var result = JsonConvert.DeserializeObject<List<Client>>(File.ReadAllText(path));
+            return result ?? new List<Client>();
         }
     }
 }
