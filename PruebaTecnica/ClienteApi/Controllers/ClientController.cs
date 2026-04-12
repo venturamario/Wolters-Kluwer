@@ -17,13 +17,13 @@ public class ClientsController : ControllerBase {
 
     #region Endpoints
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> GetAllClients()
     {
         return Ok(await _manager.GetAllValidClients());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(Client client) {
+    public async Task<IActionResult> CreateClient(Client client) {
         var success = await _manager.AddClient(client);
         return success
             ? Ok()

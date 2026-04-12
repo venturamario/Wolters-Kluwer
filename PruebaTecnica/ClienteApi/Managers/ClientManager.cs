@@ -16,20 +16,40 @@ namespace ClienteApi.Managers
 
         #region Public Methods
         public async Task<bool> AddClient(Client newClient) {
-            var clients = await _service.GetClients();
-            if (clients.Any(c => c.DNI == newClient.DNI))
+            bool added = false;
+            try
             {
-                return false;
+                var clients = await _service.GetClients();
+                if (clients.Any(c => c.DNI == newClient.DNI))
+                {
+                    return added;
+                }
+                
+                clients.Add(newClient);
+                await _service.SaveClients(clients);
+                added = true;
+                
+            } catch (Exception ex)
+            {
+                Console.WriteLine("Error al añadir cliente: " + ex.Message);
+                added = false;
             }
-            
-            clients.Add(newClient);
-            await _service.SaveClients(clients);
-            return true;
+            return added;
         }
         
         public async Task<List<Client>> GetAllValidClients()
         {
-            return await _service.GetClients();
+            List<Client> validClients = new List<Client>();
+            try
+            {
+                validClients = await _service.GetClients();
+                return validClients;
+
+            } catch (Exception ex)
+            {
+                Console.WriteLine("Error al obtener clientes: " + ex.Message);
+                return validClients;
+            }
         }
         #endregion
     }
