@@ -247,11 +247,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\clienteapi\\ClienteApi.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\ClienteApi\\ClienteApi.csproj",
       "projectName": "ClienteApi",
-      "projectPath": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\clienteapi\\ClienteApi.csproj",
+      "projectPath": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\ClienteApi\\ClienteApi.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\clienteapi\\obj\\",
+      "outputPath": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\ClienteApi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
