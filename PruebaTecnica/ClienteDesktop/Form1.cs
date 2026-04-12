@@ -16,7 +16,7 @@ namespace ClienteDesktop
         private Button btnDelete = new Button();
         
         // SOLID: Usamos una variable privada para el servicio y el repo
-        private readonly ClientRepository _clientRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly ImportService _importService;
         #endregion
 
@@ -25,13 +25,11 @@ namespace ClienteDesktop
         {
             InitializeComponent();
             
-            // Inicializamos las dependencias (En una app más grande esto lo haría un "Inyector")
             _clientRepository = new ClientRepository();
             _importService = new ImportService();
 
             ConfigureGrid();
             ConfigureControls();
-
             LoadData();
         }
         #endregion
@@ -82,7 +80,6 @@ namespace ClienteDesktop
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            // SOLID (SRP): El Form solo da la orden, el REPO sabe cómo guardar
             _clientRepository.SaveAll(clientList);
         }
         #endregion
@@ -103,12 +100,10 @@ namespace ClienteDesktop
 
                 try 
                 {
-                    // SOLID: El Form no filtra datos, le pide al servicio que lo haga
                     List<Client> imported = _importService.Import(openFileDialog.FileName, p => progressBar1.Value = p);
 
                     if (imported == null || imported.Count == 0) return;
 
-                    // Lógica de duplicados simplificada en el Form
                     bool existsAny = imported.Any(newCl => clientList.Any(curr => curr.DNI == newCl.DNI));
                     if (existsAny)
                     {
@@ -132,7 +127,7 @@ namespace ClienteDesktop
             string columnName = dataGridView1.Columns[e.ColumnIndex].DataPropertyName;
             string value = e.FormattedValue?.ToString() ?? "";
 
-            // Aquí delegamos en Validator.IsValidX (que ya tienes en Helpers)
+            // DNI Validation
             if (columnName == "DNI" || columnName == "Dni")
             {
                 if (string.IsNullOrWhiteSpace(value)) return;
@@ -151,7 +146,7 @@ namespace ClienteDesktop
                 }
             }
             
-            // 2. VALIDACIÓN DE EMAIL
+            // Email Validation
             else if (columnName == "Email")
             {
                 if (string.IsNullOrWhiteSpace(value)) return;
@@ -163,7 +158,7 @@ namespace ClienteDesktop
                 }
             }
 
-            // 3. VALIDACIÓN DE TELÉFONO
+            // Phone Validation
             else if (columnName == "Phone")
             {
                 if (string.IsNullOrWhiteSpace(value)) return;
