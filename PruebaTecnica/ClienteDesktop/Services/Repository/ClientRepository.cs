@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ClienteDesktop.Models;
 
 namespace ClienteDesktop.Services.Repository {
-    public class ClientRepository {
+    public class ClientRepository : IClientRepository {
         private readonly string _path = "clients_store.json";
 
         public List<Client> GetAll() {

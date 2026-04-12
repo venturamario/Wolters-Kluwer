@@ -105,16 +105,6 @@
             "related": ".pdb;.xml"
           }
         }
-      },
-      "Cliente.Core/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "compile": {
-          "bin/placeholder/Cliente.Core.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Cliente.Core.dll": {}
-        }
       }
     }
   },
@@ -241,16 +231,10 @@
         "newtonsoft.json.bson.1.0.2.nupkg.sha512",
         "newtonsoft.json.bson.nuspec"
       ]
-    },
-    "Cliente.Core/1.0.0": {
-      "type": "project",
-      "path": "../Cliente.Core/Cliente.Core.csproj",
-      "msbuildProject": "../Cliente.Core/Cliente.Core.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Cliente.Core >= 1.0.0",
       "Microsoft.AspNetCore.Mvc.NewtonsoftJson >= 10.0.5",
       "Microsoft.AspNetCore.OpenApi >= 10.0.5",
       "Newtonsoft.Json >= 13.0.4"
@@ -287,11 +271,7 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {
-            "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\Cliente.Core\\Cliente.Core.csproj": {
-              "projectPath": "C:\\Users\\User\\Desktop\\Wolters-Kluwer\\PruebaTecnica\\Cliente.Core\\Cliente.Core.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
