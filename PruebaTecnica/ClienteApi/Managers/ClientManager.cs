@@ -18,18 +18,24 @@ public class ClientManager : IClientManager {
     public async Task<bool> AddClient(Client newClient) {
         try {
             var clients = await _service.GetClients();
-            if (clients.Any(c => c.DNI == newClient.DNI))
-            {
-                return false;
-            }
+            if (clients.Any(c => c.DNI.Equals(newClient.DNI, StringComparison.OrdinalIgnoreCase)))
+        {
+            return false;
+        }
 
             clients.Add(newClient);
             await _service.SaveClients(clients);
             return true;
 
-        } catch (Exception ex) {
+        } catch (IOException ex) 
+        {
+            _logger.LogError(ex, "Error de disco al guardar");
+            throw; 
+        } 
+        
+        catch (Exception ex) {
             _logger.LogError(ex, "Error fatal al añadir el cliente con DNI {DNI}", newClient.DNI);
-            throw new Exception("Error interno al procesar el almacenamiento."); 
+            throw; 
         }
     }
 
@@ -39,7 +45,7 @@ public class ClientManager : IClientManager {
         try
         {
             validClients = await _service.GetClients();
-            return validClients;
+            return validClients ?? new List<Client>();
 
         } catch (Exception ex)
         {
